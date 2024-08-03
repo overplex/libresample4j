@@ -11,3 +11,18 @@ There's no documentation for the Java port, but for the most part it's just like
 
 Also take a look at the C version's README which is bundled in the `libresample-0.1.3.tgz` archive.
 
+## Example
+
+```
+int sampleRateIn = 16000;
+int sampleRateOut = 48000;
+Resampler resampler = new Resampler(sampleRateIn, sampleRateOut);
+
+byte[] audioBytes; // or float[]
+byte[] resampledBytes; // or float[]
+while (...) { // Read audio data to audioBytes array
+    resampledBytes = resampler.process(audioBytes, audioDataReader.isLastBatch());
+    // lastBatch is needed to correctly form the end of the file
+    // sourceDataLine.write(resampledBytes, 0, resampledBytes.length); // Play audio
+}
+```

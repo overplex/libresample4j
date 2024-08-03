@@ -1,14 +1,12 @@
 /******************************************************************************
- *
  * libresample4j
  * Copyright (c) 2009 Laszlo Systems, Inc. All Rights Reserved.
- *
+ * ---
  * libresample4j is a Java port of Dominic Mazzoni's libresample 0.1.3,
  * which is in turn based on Julius Smith's Resample 1.7 library.
  *      http://www-ccrma.stanford.edu/~jos/resample/
- *
+ * ---
  * License: LGPL -- see the file LICENSE.txt for more information
- *
  *****************************************************************************/
 package com.laszlosystems.libresample4j;
 

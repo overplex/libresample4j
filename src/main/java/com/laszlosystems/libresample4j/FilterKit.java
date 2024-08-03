@@ -1,14 +1,12 @@
 /******************************************************************************
- *
  * libresample4j
  * Copyright (c) 2009 Laszlo Systems, Inc. All Rights Reserved.
- *
+ * ---
  * libresample4j is a Java port of Dominic Mazzoni's libresample 0.1.3,
  * which is in turn based on Julius Smith's Resample 1.7 library.
  *      http://www-ccrma.stanford.edu/~jos/resample/
- *
+ * ---
  * License: LGPL -- see the file LICENSE.txt for more information
- *
  *****************************************************************************/
 package com.laszlosystems.libresample4j;
 
@@ -16,7 +14,7 @@ package com.laszlosystems.libresample4j;
  * This file provides Kaiser-windowed low-pass filter support,
  * including a function to create the filter coefficients, and
  * two functions to apply the filter at a particular point.
- * 
+ *
  * <pre>
  * reference: "Digital Filters, 2nd edition"
  *            R.W. Hamming, pp. 178-179
@@ -74,7 +72,7 @@ public class FilterKit {
         return (sum);
     }
 
-    public static void lrsLpFilter(double c[], int N, double frq, double Beta, int Num) {
+    public static void lrsLpFilter(double[] c, int N, double frq, double Beta, int Num) {
         double IBeta, temp, temp1, inm1;
         int i;
 
@@ -98,29 +96,28 @@ public class FilterKit {
             temp = (double) i * inm1;
             temp1 = 1.0 - temp * temp;
             temp1 = (temp1 < 0 ? 0 : temp1); /*
-                                              * make sure it's not negative
-                                              * since we're taking the square
-                                              * root - this happens on Pentium
-                                              * 4's due to tiny roundoff errors
-                                              */
+             * make sure it's not negative
+             * since we're taking the square
+             * root - this happens on Pentium
+             * 4's due to tiny roundoff errors
+             */
             c[i] *= Izero(Beta * Math.sqrt(temp1)) * IBeta;
         }
     }
 
     /**
-     * 
-     * @param Imp impulse response
-     * @param ImpD impulse response deltas
-     * @param Nwing length of one wing of filter
-     * @param Interp Interpolate coefs using deltas?
+     * @param Imp      impulse response
+     * @param ImpD     impulse response deltas
+     * @param Nwing    length of one wing of filter
+     * @param Interp   Interpolate coefs using deltas?
      * @param Xp_array Current sample array
      * @param Xp_index Current sample index
-     * @param Ph Phase
-     * @param Inc increment (1 for right wing or -1 for left)
-     * @return
+     * @param Ph       Phase
+     * @param Inc      increment (1 for right wing or -1 for left)
+     * @return filter output value
      */
-    public static float lrsFilterUp(float Imp[], float ImpD[], int Nwing, boolean Interp, float[] Xp_array, int Xp_index, double Ph,
-            int Inc) {
+    public static float lrsFilterUp(float[] Imp, float[] ImpD, int Nwing, boolean Interp,
+                                    float[] Xp_array, int Xp_index, double Ph, int Inc) {
         double a = 0;
         float v, t;
 
@@ -129,13 +126,8 @@ public class FilterKit {
 
         v = 0.0f; // The output value
 
-        float[] Hp_array = Imp;
         int Hp_index = (int) Ph;
-
-        float[] End_array = Imp;
         int End_index = Nwing;
-
-        float[] Hdp_array = ImpD;
         int Hdp_index = (int) Ph;
 
         if (Interp) {
@@ -155,8 +147,8 @@ public class FilterKit {
 
         if (Interp)
             while (Hp_index < End_index) {
-                t = Hp_array[Hp_index]; /* Get filter coeff */
-                t += Hdp_array[Hdp_index] * a; /* t is now interp'd filter coeff */
+                t = Imp[Hp_index]; /* Get filter coeff */
+                t += ImpD[Hdp_index] * a; /* t is now interp'd filter coeff */
                 Hdp_index += Resampler.Npc; /* Filter coeff differences step */
                 t *= Xp_array[Xp_index]; /* Mult coeff by input sample */
                 v += t; /* The filter output */
@@ -165,7 +157,7 @@ public class FilterKit {
             }
         else
             while (Hp_index < End_index) {
-                t = Hp_array[Hp_index]; /* Get filter coeff */
+                t = Imp[Hp_index]; /* Get filter coeff */
                 t *= Xp_array[Xp_index]; /* Mult coeff by input sample */
                 v += t; /* The filter output */
                 Hp_index += Resampler.Npc; /* Filter coeff step */
@@ -176,20 +168,19 @@ public class FilterKit {
     }
 
     /**
-     * 
-     * @param Imp impulse response
-     * @param ImpD impulse response deltas
-     * @param Nwing length of one wing of filter
-     * @param Interp Interpolate coefs using deltas?
+     * @param Imp      impulse response
+     * @param ImpD     impulse response deltas
+     * @param Nwing    length of one wing of filter
+     * @param Interp   Interpolate coefs using deltas?
      * @param Xp_array Current sample array
      * @param Xp_index Current sample index
-     * @param Ph Phase
-     * @param Inc increment (1 for right wing or -1 for left)
-     * @param dhb filter sampling period
-     * @return
+     * @param Ph       Phase
+     * @param Inc      increment (1 for right wing or -1 for left)
+     * @param dhb      filter sampling period
+     * @return filter output value
      */
-    public static float lrsFilterUD(float Imp[], float ImpD[], int Nwing, boolean Interp, float[] Xp_array, int Xp_index, double Ph,
-            int Inc, double dhb) {
+    public static float lrsFilterUD(float[] Imp, float[] ImpD, int Nwing, boolean Interp,
+                                    float[] Xp_array, int Xp_index, double Ph, int Inc, double dhb) {
         float a;
         float v, t;
         double Ho;
@@ -197,7 +188,6 @@ public class FilterKit {
         v = 0.0f; // The output value
         Ho = Ph * dhb;
 
-        float[] End_array = Imp;
         int End_index = Nwing;
 
         if (Inc == 1) // If doing right wing...
@@ -208,19 +198,17 @@ public class FilterKit {
         } // first sample, so we must also
         // skip ahead in Imp[] and ImpD[]
 
-        float[] Hp_array = Imp;
         int Hp_index;
 
         if (Interp) {
-            float[] Hdp_array = ImpD;
             int Hdp_index;
 
             while ((Hp_index = (int) Ho) < End_index) {
-                t = Hp_array[Hp_index]; // Get IR sample
+                t = Imp[Hp_index]; // Get IR sample
                 Hdp_index = (int) Ho; // get interp bits from diff table
                 a = (float) (Ho - Math.floor(Ho)); // a is logically between 0
-                                                   // and 1
-                t += Hdp_array[Hdp_index] * a; // t is now interp'd filter coeff
+                // and 1
+                t += ImpD[Hdp_index] * a; // t is now interp'd filter coeff
                 t *= Xp_array[Xp_index]; // Mult coeff by input sample
                 v += t; // The filter output
                 Ho += dhb; // IR step
@@ -228,7 +216,7 @@ public class FilterKit {
             }
         } else {
             while ((Hp_index = (int) Ho) < End_index) {
-                t = Hp_array[Hp_index]; // Get IR sample
+                t = Imp[Hp_index]; // Get IR sample
                 t *= Xp_array[Xp_index]; // Mult coeff by input sample
                 v += t; // The filter output
                 Ho += dhb; // IR step
@@ -238,5 +226,4 @@ public class FilterKit {
 
         return v;
     }
-
 }
