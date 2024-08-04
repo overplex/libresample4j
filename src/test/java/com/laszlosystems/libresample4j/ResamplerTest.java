@@ -154,7 +154,7 @@ public class ResamplerTest {
   for(i=0; i<dstlen+100; i++)
      dst[i] = -99.0f;
 
-  resampler = new Resampler(true, factor, factor);
+  resampler = new Resampler(true, factor);
   fwidth = resampler.getFilterWidth();
   out = 0;
   srcpos = 0;
@@ -162,7 +162,7 @@ public class ResamplerTest {
      int srcBlock = min(srclen-srcpos, srcblocksize);
      boolean lastFlag = (srcBlock == srclen-srcpos);
 
-     Resampler.Result result = resampler.process(factor, src, srcpos, srcBlock,
+     Resampler.Result result = resampler.process(src, srcpos, srcBlock,
                           lastFlag,
                           dst, out, min(dstlen-out, dstblocksize));
 
